@@ -112,7 +112,6 @@
       pointer-events:none;
     }
 
-    /* Invisible zone equals paper-inner space (we'll use it for bounds) */
     .button-zone{
       position:relative;
       width:100%;
@@ -159,40 +158,51 @@
       pointer-events:none;
     }
 
-    .overlay{
-      position:absolute;
-      inset:0;
-      display:grid;
-      place-items:center;
-      background: rgba(11,16,32,.55);
-      backdrop-filter: blur(6px);
-      opacity:0;
-      pointer-events:none;
-      transition: opacity 240ms ease;
-      z-index:80;
+    /* Success screen styles */
+    .success-title{
+      font-weight: 900;
+      letter-spacing: .04em;
+      font-size: clamp(22px, 3.2vmin, 34px);
+      margin: 10px 0 0;
+      color: var(--ink);
     }
-    .overlay.show{ opacity:1; pointer-events:auto; }
-    .card{
-      width:min(560px, 92vw);
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.16);
-      border-radius: 18px;
-      box-shadow: 0 22px 70px rgba(0,0,0,.55);
-      padding: 22px;
-      text-align:center;
-      color:#fff;
+    .success-sub{
+      margin: 6px 0 0;
+      opacity: .85;
+      max-width: 46ch;
     }
-    .card h2{ margin:0 0 8px; font-size: 24px; }
-    .card p{ margin:0 0 14px; opacity:.9; }
-    .close{
+    .choices{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 12px;
+      justify-content:center;
+      align-items:center;
+      padding-top: 10px;
+    }
+    .choice{
+      border:0;
+      border-radius:999px;
+      padding: 10px 16px;
+      font-weight: 800;
+      cursor:pointer;
+      background: rgba(43,10,87,.10);
+      color: var(--ink);
+      border: 1px solid rgba(43,10,87,.15);
+      box-shadow: 0 10px 22px rgba(0,0,0,.10);
+      transition: transform 120ms ease;
+    }
+    .choice:active{ transform: scale(.98); }
+
+    .back{
       border:0;
       border-radius:999px;
       padding: 10px 18px;
       font-weight: 900;
       cursor:pointer;
-      background: rgba(255,255,255,.16);
-      color:#fff;
-      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(11,16,32,.10);
+      color: var(--ink);
+      border: 1px solid rgba(43,10,87,.15);
+      box-shadow: 0 10px 22px rgba(0,0,0,.10);
     }
   </style>
 </head>
@@ -210,30 +220,20 @@
           </div>
 
           <div class="hint">I dare you to click <b>NO</b> 😈</div>
-
-          <div class="overlay" id="overlay">
-            <div class="card">
-              <h2>YAY!!🥳🎉🎊</h2>
-              <p>but I still don't know what to do 🫢</p>
-			  <p>pottery?🏺 gootopia??🎯 tong yang???🍲 etc????</p>
-              <button class="close" id="closeOverlay" type="button">Close</button>
-            </div>
-          </div>
-
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    const overlay = document.getElementById("overlay");
-    const closeOverlay = document.getElementById("closeOverlay");
-
     const zone = document.getElementById("zone");
     const paperInner = document.getElementById("paperInner");
 
     const noBtn = document.getElementById("noBtn");
     const yesBtn = document.getElementById("yesBtn");
+
+    // Save the original layout so we can restore it
+    const originalPaperHTML = paperInner.innerHTML;
 
     let dodgeLevel = 0;
     let lastMoveAt = 0;
@@ -254,25 +254,21 @@
     }
 
     function applyYesScale() {
-      // Keep the translate(-50%, -50%) and add scale
       yesBtn.style.transform = `translate(-50%, -50%) scale(${yesScale})`;
     }
 
     function placeButtonsBalanced() {
       const z = zone.getBoundingClientRect();
-      // Balanced row slightly below center
       const y = Math.floor(z.height * 0.58);
 
       setButtonCenter(yesBtn, Math.floor(z.width * 0.40), y);
       setButtonCenter(noBtn,  Math.floor(z.width * 0.60), y);
 
-      // Reset NO transform to standard
       noBtn.style.transform = "translate(-50%, -50%)";
       applyYesScale();
     }
 
     function keepInsideZone(x, y, btnRect, zoneRect, pad) {
-      // x,y are desired CENTER coordinates relative to zone
       const halfW = btnRect.width / 2;
       const halfH = btnRect.height / 2;
 
@@ -292,17 +288,16 @@
     }
 
     function growYes() {
-      // Increase YES size more and more, but cap it
-      // Growth starts gentle, then ramps
-      const add = 0.035 + dodgeLevel * 0.004;   // increasing increment
+      const add = 0.035 + dodgeLevel * 0.004;
       yesScale = clamp(yesScale + add, 1, 2.35);
       applyYesScale();
 
-      // Optional: give it a little "pop" each time
       yesBtn.animate(
-        [{ transform: `translate(-50%, -50%) scale(${yesScale})` },
-         { transform: `translate(-50%, -50%) scale(${yesScale + 0.06})` },
-         { transform: `translate(-50%, -50%) scale(${yesScale})` }],
+        [
+          { transform: `translate(-50%, -50%) scale(${yesScale})` },
+          { transform: `translate(-50%, -50%) scale(${yesScale + 0.06})` },
+          { transform: `translate(-50%, -50%) scale(${yesScale})` }
+        ],
         { duration: 160, easing: "ease-out" }
       );
     }
@@ -315,30 +310,26 @@
       dodgeLevel++;
       growYes();
 
-      // Bounds are paper-inner (via zone)
       const zr = zone.getBoundingClientRect();
       const br = noBtn.getBoundingClientRect();
-
       const pad = 16;
 
-      // Pick random CENTER coordinates inside zone
       let x = randomInt(0, Math.max(0, Math.floor(zr.width)));
       let y = randomInt(0, Math.max(0, Math.floor(zr.height)));
 
-      // Clamp so the whole button stays inside the zone
       const clamped = keepInsideZone(x, y, br, zr, pad);
 
-      // Place NO by CENTER coordinates
       noBtn.style.transform = "translate(-50%, -50%)";
       setButtonCenter(noBtn, Math.floor(clamped.x), Math.floor(clamped.y));
 
-      // Make NO feel faster as attempts increase
       const d = difficulty();
       const snap = clamp(1 - (dodgeLevel * 0.01), 0.86, 1);
       noBtn.animate(
-        [{ transform: "translate(-50%, -50%) scale(1)" },
-         { transform: `translate(-50%, -50%) scale(${snap})` },
-         { transform: "translate(-50%, -50%) scale(1)" }],
+        [
+          { transform: "translate(-50%, -50%) scale(1)" },
+          { transform: `translate(-50%, -50%) scale(${snap})` },
+          { transform: "translate(-50%, -50%) scale(1)" }
+        ],
         { duration: 160 / d, easing: "ease-out" }
       );
     }
@@ -356,26 +347,94 @@
     });
     noBtn.addEventListener("focus", moveNoButtonWithinPaperInner);
 
-    // YES overlay
-    yesBtn.addEventListener("click", () => overlay.classList.add("show"));
-    closeOverlay.addEventListener("click", () => overlay.classList.remove("show"));
+    // ✅ REPLACE PAPER CONTENT ON YES (no pop-up)
+    yesBtn.addEventListener("click", () => {
+      paperInner.innerHTML = `
+        <div class="note-title">YAY!!🥳🎉🎊</div>
+
+        <div style="display:grid; gap:10px; place-items:center; width:100%;">
+          <div class="success-title">Okay… now we plan the date 😌</div>
+          <p class="success-sub">but I still don't know what to do 🫢</p>
+          <p class="success-sub">pottery?🏺 gootopia??🎯 tong yang???🍲 etc????</p>
+
+          <div class="choices">
+            <button class="choice" type="button">Pottery 🏺</button>
+            <button class="choice" type="button">Gootopia 🎯</button>
+            <button class="choice" type="button">Tong Yang 🍲</button>
+            <button class="choice" type="button">Surprise Me 🤫</button>
+          </div>
+        </div>
+
+        <div>
+          <button class="back" id="backBtn" type="button">Back</button>
+        </div>
+      `;
+
+      // Back button restores original content + rebinds listeners
+      const backBtn = document.getElementById("backBtn");
+      backBtn.addEventListener("click", () => {
+        paperInner.innerHTML = originalPaperHTML;
+
+        // Re-grab elements (because we replaced the DOM)
+        const newZone = document.getElementById("zone");
+        const newNo = document.getElementById("noBtn");
+        const newYes = document.getElementById("yesBtn");
+
+        // Update references
+        zone.replaceWith(newZone); // keep layout stable
+        // Re-assign globals by mutation (simple approach)
+        // (We’ll just rebind listeners using the new elements)
+
+        // Reset gameplay state
+        dodgeLevel = 0;
+        yesScale = 1;
+        lastMoveAt = 0;
+
+        // Re-attach behaviors
+        newNo.addEventListener("mouseenter", moveNoButtonWithinPaperInner);
+        newNo.addEventListener("pointerdown", (e) => {
+          e.preventDefault();
+          moveNoButtonWithinPaperInner();
+        });
+        newNo.addEventListener("focus", moveNoButtonWithinPaperInner);
+
+        newYes.addEventListener("click", () => {
+          // trigger the same YES behavior again by calling click handler:
+          // easiest: reload the page section by clicking again
+          // (or you can factor this into a function)
+          location.reload();
+        });
+
+        // Re-position buttons
+        requestAnimationFrame(() => {
+          placeButtonsBalanced();
+        });
+      });
+    });
 
     // Resize: keep inside and re-balance
     window.addEventListener("resize", () => {
       requestAnimationFrame(() => {
+        // If buttons no longer exist (after YES), just skip
+        const z = document.getElementById("zone");
+        const nb = document.getElementById("noBtn");
+        const yb = document.getElementById("yesBtn");
+        if (!z || !nb || !yb) return;
+
+        // Update references used by placement functions
+        // (Functions read from original constants, but styles are on elements.
+        //  This works as long as original buttons still exist.)
         placeButtonsBalanced();
 
-        // If NO ended up out of bounds (rare), re-clamp into zone
-        const zr = zone.getBoundingClientRect();
-        const br = noBtn.getBoundingClientRect();
+        const zr = z.getBoundingClientRect();
+        const br = nb.getBoundingClientRect();
 
-        // Convert current NO center into zone coords
-        const nl = parseFloat(noBtn.style.left || "0");
-        const nt = parseFloat(noBtn.style.top || "0");
+        const nl = parseFloat(nb.style.left || "0");
+        const nt = parseFloat(nb.style.top || "0");
         const pad = 16;
 
         const clamped = keepInsideZone(nl, nt, br, zr, pad);
-        setButtonCenter(noBtn, Math.floor(clamped.x), Math.floor(clamped.y));
+        setButtonCenter(nb, Math.floor(clamped.x), Math.floor(clamped.y));
       });
     });
   </script>
