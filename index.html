@@ -3,120 +3,379 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Runaway NO Button</title>
+  <title>Will You Be Resigning?</title>
+
+  <!-- Flowing calligraphy font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
   <style>
-    :root { --pad: 16px; }
-
-    body {
-      margin: 0;
-      height: 100vh;
-      display: grid;
-      place-items: center;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: #0b1020;
-      color: #fff;
-      overflow: hidden;
+    :root{
+      --bg:#0b1020;
+      --paper:#fff7ff;
+      --paper2:#ffffff;
+      --ink:#2b0a57;
+      --pad:18px;
     }
 
-    .stage {
-      position: relative;
-      width: min(680px, calc(100vw - 2 * var(--pad)));
-      height: min(420px, calc(100vh - 2 * var(--pad)));
-      border-radius: 18px;
-      background: rgba(255,255,255,0.06);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
-      border: 1px solid rgba(255,255,255,0.12);
-      overflow: hidden;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      height:100vh;
+      display:grid;
+      place-items:center;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 700px at 50% 25%, rgba(180,130,255,.18), transparent 60%),
+        var(--bg);
+      overflow:hidden;
+      color:#fff;
     }
 
-    .hint {
-      position: absolute;
-      top: 14px;
-      left: 16px;
-      opacity: 0.85;
-      font-size: 14px;
-      user-select: none;
+    .wrap{
+      width:min(1200px, calc(100vw - 2*var(--pad)));
+      height:min(720px, calc(100vh - 2*var(--pad)));
+      display:grid;
+      place-items:center;
+      position:relative;
     }
 
-    #noBtn {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      padding: 14px 26px;
-      border: 0;
-      border-radius: 999px;
-      background: #ff3b5c;
-      color: white;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      cursor: pointer;
-      box-shadow: 0 12px 30px rgba(255,59,92,0.35);
-      transition: transform 80ms ease;
+    .letter-screen{
+      width:min(75vw, 1100px);
+      height:min(75vh, 720px);
+      aspect-ratio: 16 / 10;
+      display:grid;
+      place-items:center;
+      animation: letterPop 420ms ease-out 1;
+      position:relative;
+    }
+
+    @keyframes letterPop{
+      from{ transform: scale(.985); opacity:0; }
+      to  { transform: scale(1); opacity:1; }
+    }
+
+    .paper{
+      width: min(760px, 94%);
+      height: min(560px, 94%);
+      background: linear-gradient(180deg, var(--paper), var(--paper2));
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 28px 70px rgba(0,0,0,.45);
+      color: var(--ink);
+      position:relative;
+      overflow:hidden;
+      animation: slideBounce 850ms cubic-bezier(.2,.9,.22,1) 1;
+    }
+
+    .paper::before{
+      content:"";
+      position:absolute;
+      left:0; right:0; top:0;
+      height:18px;
+      background: linear-gradient(180deg, rgba(0,0,0,.06), transparent);
+      opacity:.35;
+      pointer-events:none;
+    }
+
+    @keyframes slideBounce{
+      0%   { transform: translateY(70px); }
+      70%  { transform: translateY(-8px); }
+      84%  { transform: translateY(6px); }
+      93%  { transform: translateY(-3px); }
+      100% { transform: translateY(0px); }
+    }
+
+    .paper-inner{
+      width:100%;
+      height:100%;
+      padding: clamp(18px, 2.4vmin, 34px);
+      display:grid;
+      grid-template-rows: auto 1fr auto;
+      gap: clamp(10px, 1.6vmin, 18px);
+      place-items:center;
+      text-align:center;
+      position:relative;
+      overflow:hidden; /* IMPORTANT: NO must stay within this */
+    }
+
+    .note-title{
+      font-family: "Great Vibes", cursive;
+      color: var(--ink);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      font-size: clamp(38px, 6.2vmin, 72px);
+      margin-top: 8px;
+      line-height: 1.05;
+      text-shadow: 0 1px 0 rgba(255,255,255,.55);
+      pointer-events:none;
+    }
+
+    /* Invisible zone equals paper-inner space (we'll use it for bounds) */
+    .button-zone{
+      position:relative;
+      width:100%;
+      height:100%;
+      pointer-events:none;
+    }
+
+    .btn{
+      border:0;
+      border-radius:999px;
+      padding: clamp(12px, 1.8vmin, 16px) clamp(18px, 2.6vmin, 28px);
+      font-weight: 900;
+      letter-spacing: .10em;
+      cursor:pointer;
       touch-action: manipulation;
+      box-shadow: 0 12px 28px rgba(0,0,0,.18);
+      transition: transform 120ms ease;
+      position:absolute;
+      pointer-events:auto;
+      transform: translate(-50%, -50%);
+      transform-origin: center;
+      will-change: transform;
+    }
+    .btn:active{ transform: translate(-50%, -50%) scale(.96); }
+
+    #yesBtn{
+      background:#33d17a;
+      color:#082114;
+      z-index:2;
     }
 
-    #noBtn:active {
-      transform: translate(-50%, -50%) scale(0.96);
+    #noBtn{
+      background:#ff3b5c;
+      color:#fff;
+      box-shadow: 0 14px 34px rgba(255,59,92,.35);
+      z-index:3;
+    }
+
+    .hint{
+      font-size: clamp(12px, 1.8vmin, 14px);
+      opacity:.75;
+      margin-top:-6px;
+      color: rgba(43,10,87,.75);
+      pointer-events:none;
+    }
+
+    .overlay{
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      background: rgba(11,16,32,.55);
+      backdrop-filter: blur(6px);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity 240ms ease;
+      z-index:80;
+    }
+    .overlay.show{ opacity:1; pointer-events:auto; }
+    .card{
+      width:min(560px, 92vw);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 18px;
+      box-shadow: 0 22px 70px rgba(0,0,0,.55);
+      padding: 22px;
+      text-align:center;
+      color:#fff;
+    }
+    .card h2{ margin:0 0 8px; font-size: 24px; }
+    .card p{ margin:0 0 14px; opacity:.9; }
+    .close{
+      border:0;
+      border-radius:999px;
+      padding: 10px 18px;
+      font-weight: 900;
+      cursor:pointer;
+      background: rgba(255,255,255,.16);
+      color:#fff;
+      border: 1px solid rgba(255,255,255,.18);
     }
   </style>
 </head>
+
 <body>
-  <div class="stage" id="stage">
-    <div class="hint">Try to hover or click the <b>NO</b> button 😈</div>
-    <button id="noBtn" type="button">NO</button>
+  <div class="wrap">
+    <div class="letter-screen">
+      <div class="paper">
+        <div class="paper-inner" id="paperInner">
+          <div class="note-title">Will you be resigning?</div>
+
+          <div class="button-zone" id="zone">
+            <button class="btn" id="yesBtn" type="button">YES</button>
+            <button class="btn" id="noBtn" type="button">NO</button>
+          </div>
+
+          <div class="hint">Try clicking <b>NO</b> 😈</div>
+
+          <div class="overlay" id="overlay">
+            <div class="card">
+              <h2>HR HAS BEEN NOTIFIED 🫢</h2>
+              <p>This action cannot be undone.</p>
+              <button class="close" id="closeOverlay" type="button">Close</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    const stage = document.getElementById("stage");
-    const btn = document.getElementById("noBtn");
+    const overlay = document.getElementById("overlay");
+    const closeOverlay = document.getElementById("closeOverlay");
+
+    const zone = document.getElementById("zone");
+    const paperInner = document.getElementById("paperInner");
+
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+
+    let dodgeLevel = 0;
+    let lastMoveAt = 0;
+
+    // YES growth control
+    let yesScale = 1;
 
     function clamp(n, min, max) {
       return Math.max(min, Math.min(max, n));
     }
-
     function randomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function moveButton() {
-      const s = stage.getBoundingClientRect();
-      const b = btn.getBoundingClientRect();
-
-      // Keep the button fully inside the stage
-      const maxX = s.width - b.width;
-      const maxY = s.height - b.height;
-
-      const x = randomInt(0, Math.max(0, Math.floor(maxX)));
-      const y = randomInt(0, Math.max(0, Math.floor(maxY)));
-
-      // Place via left/top (no translate) for simpler bounds math
-      btn.style.transform = "none";
-      btn.style.left = clamp(x, 0, maxX) + "px";
-      btn.style.top  = clamp(y, 0, maxY) + "px";
+    function setButtonCenter(el, x, y) {
+      el.style.left = x + "px";
+      el.style.top  = y + "px";
     }
 
-    // Dodge when hovered
-    btn.addEventListener("mouseenter", moveButton);
+    function applyYesScale() {
+      // Keep the translate(-50%, -50%) and add scale
+      yesBtn.style.transform = `translate(-50%, -50%) scale(${yesScale})`;
+    }
 
-    // Dodge if user tries to press/click
-    btn.addEventListener("pointerdown", (e) => {
-      // prevent a normal click from landing
-      e.preventDefault();
-      moveButton();
+    function placeButtonsBalanced() {
+      const z = zone.getBoundingClientRect();
+      // Balanced row slightly below center
+      const y = Math.floor(z.height * 0.58);
+
+      setButtonCenter(yesBtn, Math.floor(z.width * 0.40), y);
+      setButtonCenter(noBtn,  Math.floor(z.width * 0.60), y);
+
+      // Reset NO transform to standard
+      noBtn.style.transform = "translate(-50%, -50%)";
+      applyYesScale();
+    }
+
+    function keepInsideZone(x, y, btnRect, zoneRect, pad) {
+      // x,y are desired CENTER coordinates relative to zone
+      const halfW = btnRect.width / 2;
+      const halfH = btnRect.height / 2;
+
+      const minX = pad + halfW;
+      const maxX = zoneRect.width - pad - halfW;
+      const minY = pad + halfH;
+      const maxY = zoneRect.height - pad - halfH;
+
+      return {
+        x: clamp(x, minX, maxX),
+        y: clamp(y, minY, maxY)
+      };
+    }
+
+    function difficulty() {
+      return Math.min(1 + dodgeLevel * 0.18, 3.2);
+    }
+
+    function growYes() {
+      // Increase YES size more and more, but cap it
+      // Growth starts gentle, then ramps
+      const add = 0.035 + dodgeLevel * 0.004;   // increasing increment
+      yesScale = clamp(yesScale + add, 1, 2.35);
+      applyYesScale();
+
+      // Optional: give it a little "pop" each time
+      yesBtn.animate(
+        [{ transform: `translate(-50%, -50%) scale(${yesScale})` },
+         { transform: `translate(-50%, -50%) scale(${yesScale + 0.06})` },
+         { transform: `translate(-50%, -50%) scale(${yesScale})` }],
+        { duration: 160, easing: "ease-out" }
+      );
+    }
+
+    function moveNoButtonWithinPaperInner() {
+      const now = performance.now();
+      if (now - lastMoveAt < 30) return;
+      lastMoveAt = now;
+
+      dodgeLevel++;
+      growYes();
+
+      // Bounds are paper-inner (via zone)
+      const zr = zone.getBoundingClientRect();
+      const br = noBtn.getBoundingClientRect();
+
+      const pad = 16;
+
+      // Pick random CENTER coordinates inside zone
+      let x = randomInt(0, Math.max(0, Math.floor(zr.width)));
+      let y = randomInt(0, Math.max(0, Math.floor(zr.height)));
+
+      // Clamp so the whole button stays inside the zone
+      const clamped = keepInsideZone(x, y, br, zr, pad);
+
+      // Place NO by CENTER coordinates
+      noBtn.style.transform = "translate(-50%, -50%)";
+      setButtonCenter(noBtn, Math.floor(clamped.x), Math.floor(clamped.y));
+
+      // Make NO feel faster as attempts increase
+      const d = difficulty();
+      const snap = clamp(1 - (dodgeLevel * 0.01), 0.86, 1);
+      noBtn.animate(
+        [{ transform: "translate(-50%, -50%) scale(1)" },
+         { transform: `translate(-50%, -50%) scale(${snap})` },
+         { transform: "translate(-50%, -50%) scale(1)" }],
+        { duration: 160 / d, easing: "ease-out" }
+      );
+    }
+
+    // Initial placement after layout
+    requestAnimationFrame(() => {
+      placeButtonsBalanced();
     });
 
-    // Optional: also dodge on keyboard focus (tabbing)
-    btn.addEventListener("focus", moveButton);
+    // Dodge behavior
+    noBtn.addEventListener("mouseenter", moveNoButtonWithinPaperInner);
+    noBtn.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      moveNoButtonWithinPaperInner();
+    });
+    noBtn.addEventListener("focus", moveNoButtonWithinPaperInner);
 
-    // Initialize centered using left/top (after layout)
-    requestAnimationFrame(() => {
-      // Put it in center in left/top coordinates once, then it can run away
-      const s = stage.getBoundingClientRect();
-      const b = btn.getBoundingClientRect();
-      btn.style.transform = "none";
-      btn.style.left = Math.floor((s.width - b.width) / 2) + "px";
-      btn.style.top  = Math.floor((s.height - b.height) / 2) + "px";
+    // YES overlay
+    yesBtn.addEventListener("click", () => overlay.classList.add("show"));
+    closeOverlay.addEventListener("click", () => overlay.classList.remove("show"));
+
+    // Resize: keep inside and re-balance
+    window.addEventListener("resize", () => {
+      requestAnimationFrame(() => {
+        placeButtonsBalanced();
+
+        // If NO ended up out of bounds (rare), re-clamp into zone
+        const zr = zone.getBoundingClientRect();
+        const br = noBtn.getBoundingClientRect();
+
+        // Convert current NO center into zone coords
+        const nl = parseFloat(noBtn.style.left || "0");
+        const nt = parseFloat(noBtn.style.top || "0");
+        const pad = 16;
+
+        const clamped = keepInsideZone(nl, nt, br, zr, pad);
+        setButtonCenter(noBtn, Math.floor(clamped.x), Math.floor(clamped.y));
+      });
     });
   </script>
 </body>
