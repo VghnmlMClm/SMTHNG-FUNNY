@@ -38,22 +38,6 @@
       height:min(720px, calc(100vh - 2*var(--pad)));
       display:grid;
       place-items:center;
-      position:relative;
-    }
-
-    .letter-screen{
-      width:min(75vw, 1100px);
-      height:min(75vh, 720px);
-      aspect-ratio: 16 / 10;
-      display:grid;
-      place-items:center;
-      animation: letterPop 420ms ease-out 1;
-      position:relative;
-    }
-
-    @keyframes letterPop{
-      from{ transform: scale(.985); opacity:0; }
-      to  { transform: scale(1); opacity:1; }
     }
 
     .paper{
@@ -61,55 +45,25 @@
       height: min(560px, 94%);
       background: linear-gradient(180deg, var(--paper), var(--paper2));
       border-radius: 22px;
-      border: 1px solid rgba(255,255,255,.16);
       box-shadow: 0 28px 70px rgba(0,0,0,.45);
       color: var(--ink);
-      position:relative;
       overflow:hidden;
-      animation: slideBounce 850ms cubic-bezier(.2,.9,.22,1) 1;
-    }
-
-    .paper::before{
-      content:"";
-      position:absolute;
-      left:0; right:0; top:0;
-      height:18px;
-      background: linear-gradient(180deg, rgba(0,0,0,.06), transparent);
-      opacity:.35;
-      pointer-events:none;
-    }
-
-    @keyframes slideBounce{
-      0%   { transform: translateY(70px); }
-      70%  { transform: translateY(-8px); }
-      84%  { transform: translateY(6px); }
-      93%  { transform: translateY(-3px); }
-      100% { transform: translateY(0px); }
     }
 
     .paper-inner{
       width:100%;
       height:100%;
-      padding: clamp(18px, 2.4vmin, 34px);
+      padding: 28px;
       display:grid;
       grid-template-rows: auto 1fr auto;
-      gap: clamp(10px, 1.6vmin, 18px);
       place-items:center;
       text-align:center;
-      position:relative;
-      overflow:hidden; /* IMPORTANT: NO must stay within this */
     }
 
     .note-title{
       font-family: "Great Vibes", cursive;
-      color: var(--ink);
-      font-weight: 400;
-      letter-spacing: 0.02em;
-      font-size: clamp(38px, 6.2vmin, 72px);
-      margin-top: 8px;
-      line-height: 1.05;
-      text-shadow: 0 1px 0 rgba(255,255,255,.55);
-      pointer-events:none;
+      font-size: clamp(38px, 6vmin, 72px);
+      margin-top: 10px;
     }
 
     .button-zone{
@@ -120,323 +74,144 @@
     }
 
     .btn{
-      border:0;
-      border-radius:999px;
-      padding: clamp(12px, 1.8vmin, 16px) clamp(18px, 2.6vmin, 28px);
-      font-weight: 900;
-      letter-spacing: .10em;
-      cursor:pointer;
-      touch-action: manipulation;
-      box-shadow: 0 12px 28px rgba(0,0,0,.18);
-      transition: transform 120ms ease;
       position:absolute;
-      pointer-events:auto;
       transform: translate(-50%, -50%);
-      transform-origin: center;
-      will-change: transform;
+      border-radius:999px;
+      padding: 14px 26px;
+      font-weight:900;
+      letter-spacing:.12em;
+      cursor:pointer;
+      pointer-events:auto;
+      border:0;
+      box-shadow: 0 14px 32px rgba(0,0,0,.25);
     }
-    .btn:active{ transform: translate(-50%, -50%) scale(.96); }
 
     #yesBtn{
       background:#33d17a;
       color:#082114;
-      z-index:2;
     }
 
     #noBtn{
       background:#ff3b5c;
       color:#fff;
-      box-shadow: 0 14px 34px rgba(255,59,92,.35);
-      z-index:3;
     }
 
     .hint{
-      font-size: clamp(12px, 1.8vmin, 14px);
-      opacity:.75;
-      margin-top:-6px;
-      color: rgba(43,10,87,.75);
-      pointer-events:none;
+      opacity:.7;
+      font-size:14px;
     }
 
-    /* Success screen styles */
+    /* SUCCESS STYLES */
     .success-title{
-      font-weight: 900;
-      letter-spacing: .04em;
-      font-size: clamp(22px, 3.2vmin, 34px);
-      margin: 10px 0 0;
-      color: var(--ink);
+      font-weight:900;
+      font-size: clamp(22px, 3vmin, 32px);
+      margin-top: 10px;
     }
+
     .success-sub{
-      margin: 6px 0 0;
-      opacity: .85;
-      max-width: 46ch;
+      opacity:.85;
+      max-width: 44ch;
     }
+
     .choices{
       display:flex;
       flex-wrap:wrap;
-      gap: 12px;
+      gap:12px;
       justify-content:center;
-      align-items:center;
-      padding-top: 10px;
     }
-    .choice{
-      border:0;
-      border-radius:999px;
-      padding: 10px 16px;
-      font-weight: 800;
-      cursor:pointer;
-      background: rgba(43,10,87,.10);
-      color: var(--ink);
-      border: 1px solid rgba(43,10,87,.15);
-      box-shadow: 0 10px 22px rgba(0,0,0,.10);
-      transition: transform 120ms ease;
-    }
-    .choice:active{ transform: scale(.98); }
 
-    .back{
-      border:0;
+    .choice, .back{
       border-radius:999px;
       padding: 10px 18px;
-      font-weight: 900;
+      font-weight:800;
       cursor:pointer;
-      background: rgba(11,16,32,.10);
+      border:1px solid rgba(43,10,87,.2);
+      background: rgba(43,10,87,.1);
       color: var(--ink);
-      border: 1px solid rgba(43,10,87,.15);
-      box-shadow: 0 10px 22px rgba(0,0,0,.10);
     }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="letter-screen">
-      <div class="paper">
-        <div class="paper-inner" id="paperInner">
-          <div class="note-title">Will You Be My Valentine?</div>
+<div class="wrap">
+  <div class="paper">
+    <div class="paper-inner" id="paperInner">
 
-          <div class="button-zone" id="zone">
-            <button class="btn" id="yesBtn" type="button">YES</button>
-            <button class="btn" id="noBtn" type="button">NO</button>
-          </div>
+      <div class="note-title">Will You Be My Valentine?</div>
 
-          <div class="hint">I dare you to click <b>NO</b> 😈</div>
-        </div>
+      <div class="button-zone" id="zone">
+        <button class="btn" id="yesBtn">YES</button>
+        <button class="btn" id="noBtn">NO</button>
       </div>
+
+      <div class="hint">I dare you to click <b>NO</b> 😈</div>
+
     </div>
   </div>
+</div>
 
-  <script>
-    const zone = document.getElementById("zone");
-    const paperInner = document.getElementById("paperInner");
+<script>
+const paperInner = document.getElementById("paperInner");
+const zone = document.getElementById("zone");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
 
-    const noBtn = document.getElementById("noBtn");
-    const yesBtn = document.getElementById("yesBtn");
+let yesScale = 1;
+let dodge = 0;
 
-    // Save the original layout so we can restore it
-    const originalPaperHTML = paperInner.innerHTML;
+function placeButtons(){
+  const r = zone.getBoundingClientRect();
+  yesBtn.style.left = r.width * 0.4 + "px";
+  yesBtn.style.top  = r.height * 0.55 + "px";
+  noBtn.style.left  = r.width * 0.6 + "px";
+  noBtn.style.top   = r.height * 0.55 + "px";
+}
 
-    let dodgeLevel = 0;
-    let lastMoveAt = 0;
+function moveNo(){
+  dodge++;
+  yesScale = Math.min(yesScale + 0.05, 2.4);
+  yesBtn.style.transform = `translate(-50%, -50%) scale(${yesScale})`;
 
-    // YES growth control
-    let yesScale = 1;
+  const r = zone.getBoundingClientRect();
+  const x = Math.random() * (r.width - 100) + 50;
+  const y = Math.random() * (r.height - 100) + 50;
+  noBtn.style.left = x + "px";
+  noBtn.style.top  = y + "px";
+}
 
-    function clamp(n, min, max) {
-      return Math.max(min, Math.min(max, n));
-    }
-    function randomInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
+noBtn.addEventListener("mouseenter", moveNo);
+noBtn.addEventListener("pointerdown", moveNo);
 
-    function setButtonCenter(el, x, y) {
-      el.style.left = x + "px";
-      el.style.top  = y + "px";
-    }
+yesBtn.addEventListener("click", () => {
+  paperInner.innerHTML = `
+    <div class="note-title">YAY!! 🥳🎉🎊</div>
 
-    function applyYesScale() {
-      yesBtn.style.transform = `translate(-50%, -50%) scale(${yesScale})`;
-    }
+    <div style="display:grid; gap:14px; place-items:center;">
+      <img 
+        src="https://media.tenor.com/CFhoSD3vWGQAAAAC/ufc.gif"
+        alt="UFC celebration"
+        style="
+          width:min(169px,80%);
+          border-radius:16px;
+          box-shadow:
+            0 0 0 6px rgba(51,209,122,.25),
+            0 18px 44px rgba(0,0,0,.45);
+        "
+      />
 
-    function placeButtonsBalanced() {
-      const z = zone.getBoundingClientRect();
-      const y = Math.floor(z.height * 0.58);
+      <div class="success-title">OKAY WOW 😤💥 YOU SAID YES</div>
+      <p class="success-sub">but I still don't know what to do 🫢</p>
+      <p class="success-sub">pottery?🏺 gootopia??🎯 tong yang???🍲 etc????</p>
+    </div>
 
-      setButtonCenter(yesBtn, Math.floor(z.width * 0.40), y);
-      setButtonCenter(noBtn,  Math.floor(z.width * 0.60), y);
+    <div>
+      <button class="back" onclick="location.reload()">Back</button>
+    </div>
+  `;
+});
 
-      noBtn.style.transform = "translate(-50%, -50%)";
-      applyYesScale();
-    }
-
-    function keepInsideZone(x, y, btnRect, zoneRect, pad) {
-      const halfW = btnRect.width / 2;
-      const halfH = btnRect.height / 2;
-
-      const minX = pad + halfW;
-      const maxX = zoneRect.width - pad - halfW;
-      const minY = pad + halfH;
-      const maxY = zoneRect.height - pad - halfH;
-
-      return {
-        x: clamp(x, minX, maxX),
-        y: clamp(y, minY, maxY)
-      };
-    }
-
-    function difficulty() {
-      return Math.min(1 + dodgeLevel * 0.18, 3.2);
-    }
-
-    function growYes() {
-      const add = 0.035 + dodgeLevel * 0.004;
-      yesScale = clamp(yesScale + add, 1, 2.35);
-      applyYesScale();
-
-      yesBtn.animate(
-        [
-          { transform: `translate(-50%, -50%) scale(${yesScale})` },
-          { transform: `translate(-50%, -50%) scale(${yesScale + 0.06})` },
-          { transform: `translate(-50%, -50%) scale(${yesScale})` }
-        ],
-        { duration: 160, easing: "ease-out" }
-      );
-    }
-
-    function moveNoButtonWithinPaperInner() {
-      const now = performance.now();
-      if (now - lastMoveAt < 30) return;
-      lastMoveAt = now;
-
-      dodgeLevel++;
-      growYes();
-
-      const zr = zone.getBoundingClientRect();
-      const br = noBtn.getBoundingClientRect();
-      const pad = 16;
-
-      let x = randomInt(0, Math.max(0, Math.floor(zr.width)));
-      let y = randomInt(0, Math.max(0, Math.floor(zr.height)));
-
-      const clamped = keepInsideZone(x, y, br, zr, pad);
-
-      noBtn.style.transform = "translate(-50%, -50%)";
-      setButtonCenter(noBtn, Math.floor(clamped.x), Math.floor(clamped.y));
-
-      const d = difficulty();
-      const snap = clamp(1 - (dodgeLevel * 0.01), 0.86, 1);
-      noBtn.animate(
-        [
-          { transform: "translate(-50%, -50%) scale(1)" },
-          { transform: `translate(-50%, -50%) scale(${snap})` },
-          { transform: "translate(-50%, -50%) scale(1)" }
-        ],
-        { duration: 160 / d, easing: "ease-out" }
-      );
-    }
-
-    // Initial placement after layout
-    requestAnimationFrame(() => {
-      placeButtonsBalanced();
-    });
-
-    // Dodge behavior
-    noBtn.addEventListener("mouseenter", moveNoButtonWithinPaperInner);
-    noBtn.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      moveNoButtonWithinPaperInner();
-    });
-    noBtn.addEventListener("focus", moveNoButtonWithinPaperInner);
-
-    // ✅ REPLACE PAPER CONTENT ON YES (no pop-up)
-    yesBtn.addEventListener("click", () => {
-      paperInner.innerHTML = `
-        <div class="note-title">YAY!!🥳🎉🎊</div>
-
-        <div style="display:grid; gap:10px; place-items:center; width:100%;">
-          <div class="success-title">Okay… now we plan the date 😌</div>
-          <p class="success-sub">but I still don't know what to do 🫢</p>
-          <p class="success-sub">pottery?🏺 gootopia??🎯 tong yang???🍲 etc????</p>
-
-          <div class="choices">
-            <button class="choice" type="button">Pottery 🏺</button>
-            <button class="choice" type="button">Gootopia 🎯</button>
-            <button class="choice" type="button">Tong Yang 🍲</button>
-            <button class="choice" type="button">Surprise Me 🤫</button>
-          </div>
-        </div>
-
-        <div>
-          <button class="back" id="backBtn" type="button">Back</button>
-        </div>
-      `;
-
-      // Back button restores original content + rebinds listeners
-      const backBtn = document.getElementById("backBtn");
-      backBtn.addEventListener("click", () => {
-        paperInner.innerHTML = originalPaperHTML;
-
-        // Re-grab elements (because we replaced the DOM)
-        const newZone = document.getElementById("zone");
-        const newNo = document.getElementById("noBtn");
-        const newYes = document.getElementById("yesBtn");
-
-        // Update references
-        zone.replaceWith(newZone); // keep layout stable
-        // Re-assign globals by mutation (simple approach)
-        // (We’ll just rebind listeners using the new elements)
-
-        // Reset gameplay state
-        dodgeLevel = 0;
-        yesScale = 1;
-        lastMoveAt = 0;
-
-        // Re-attach behaviors
-        newNo.addEventListener("mouseenter", moveNoButtonWithinPaperInner);
-        newNo.addEventListener("pointerdown", (e) => {
-          e.preventDefault();
-          moveNoButtonWithinPaperInner();
-        });
-        newNo.addEventListener("focus", moveNoButtonWithinPaperInner);
-
-        newYes.addEventListener("click", () => {
-          // trigger the same YES behavior again by calling click handler:
-          // easiest: reload the page section by clicking again
-          // (or you can factor this into a function)
-          location.reload();
-        });
-
-        // Re-position buttons
-        requestAnimationFrame(() => {
-          placeButtonsBalanced();
-        });
-      });
-    });
-
-    // Resize: keep inside and re-balance
-    window.addEventListener("resize", () => {
-      requestAnimationFrame(() => {
-        // If buttons no longer exist (after YES), just skip
-        const z = document.getElementById("zone");
-        const nb = document.getElementById("noBtn");
-        const yb = document.getElementById("yesBtn");
-        if (!z || !nb || !yb) return;
-
-        // Update references used by placement functions
-        // (Functions read from original constants, but styles are on elements.
-        //  This works as long as original buttons still exist.)
-        placeButtonsBalanced();
-
-        const zr = z.getBoundingClientRect();
-        const br = nb.getBoundingClientRect();
-
-        const nl = parseFloat(nb.style.left || "0");
-        const nt = parseFloat(nb.style.top || "0");
-        const pad = 16;
-
-        const clamped = keepInsideZone(nl, nt, br, zr, pad);
-        setButtonCenter(nb, Math.floor(clamped.x), Math.floor(clamped.y));
-      });
-    });
-  </script>
+requestAnimationFrame(placeButtons);
+window.addEventListener("resize", placeButtons);
+</script>
 </body>
 </html>
