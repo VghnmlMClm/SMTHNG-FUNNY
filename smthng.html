@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Runaway NO Button</title>
+  <style>
+    :root { --pad: 16px; }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #0b1020;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    .stage {
+      position: relative;
+      width: min(680px, calc(100vw - 2 * var(--pad)));
+      height: min(420px, calc(100vh - 2 * var(--pad)));
+      border-radius: 18px;
+      background: rgba(255,255,255,0.06);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.12);
+      overflow: hidden;
+    }
+
+    .hint {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      opacity: 0.85;
+      font-size: 14px;
+      user-select: none;
+    }
+
+    #noBtn {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      padding: 14px 26px;
+      border: 0;
+      border-radius: 999px;
+      background: #ff3b5c;
+      color: white;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(255,59,92,0.35);
+      transition: transform 80ms ease;
+      touch-action: manipulation;
+    }
+
+    #noBtn:active {
+      transform: translate(-50%, -50%) scale(0.96);
+    }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="hint">Try to hover or click the <b>NO</b> button 😈</div>
+    <button id="noBtn" type="button">NO</button>
+  </div>
+
+  <script>
+    const stage = document.getElementById("stage");
+    const btn = document.getElementById("noBtn");
+
+    function clamp(n, min, max) {
+      return Math.max(min, Math.min(max, n));
+    }
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function moveButton() {
+      const s = stage.getBoundingClientRect();
+      const b = btn.getBoundingClientRect();
+
+      // Keep the button fully inside the stage
+      const maxX = s.width - b.width;
+      const maxY = s.height - b.height;
+
+      const x = randomInt(0, Math.max(0, Math.floor(maxX)));
+      const y = randomInt(0, Math.max(0, Math.floor(maxY)));
+
+      // Place via left/top (no translate) for simpler bounds math
+      btn.style.transform = "none";
+      btn.style.left = clamp(x, 0, maxX) + "px";
+      btn.style.top  = clamp(y, 0, maxY) + "px";
+    }
+
+    // Dodge when hovered
+    btn.addEventListener("mouseenter", moveButton);
+
+    // Dodge if user tries to press/click
+    btn.addEventListener("pointerdown", (e) => {
+      // prevent a normal click from landing
+      e.preventDefault();
+      moveButton();
+    });
+
+    // Optional: also dodge on keyboard focus (tabbing)
+    btn.addEventListener("focus", moveButton);
+
+    // Initialize centered using left/top (after layout)
+    requestAnimationFrame(() => {
+      // Put it in center in left/top coordinates once, then it can run away
+      const s = stage.getBoundingClientRect();
+      const b = btn.getBoundingClientRect();
+      btn.style.transform = "none";
+      btn.style.left = Math.floor((s.width - b.width) / 2) + "px";
+      btn.style.top  = Math.floor((s.height - b.height) / 2) + "px";
+    });
+  </script>
+</body>
+</html>
